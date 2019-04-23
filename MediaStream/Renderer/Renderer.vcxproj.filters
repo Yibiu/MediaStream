@@ -41,6 +41,9 @@
     <ClCompile Include="opengl_pano.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="opengl_skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Renderer.h">
@@ -53,6 +56,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="opengl_pano.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="opengl_skybox.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -4,26 +4,17 @@
 #include "shader.h"
 
 
-#define ENABLE_VR360		1
-
-
 /**
 * @brief:
-* Renderer for VR videos.
-* 1. For flat plane;
-* 2. For 180/360 view.
-*
-* Mat = model * view * projection
-* view if fix, projection is fix, model is changing!
-* notice the difference of frustum and perspective!
+* CUBMAP for OpenGL skybox
 */
-class COpenGLPano : public QOpenGLWidget, public QOpenGLFunctions
+class COpenGLSkyBox : public QOpenGLWidget, public QOpenGLFunctions
 {
 	Q_OBJECT
 
 public:
-	COpenGLPano(QWidget *parent = Q_NULLPTR);
-	virtual ~COpenGLPano();
+	COpenGLSkyBox(QWidget *parent = Q_NULLPTR);
+	virtual ~COpenGLSkyBox();
 
 	// override
 	virtual void initializeGL();
@@ -33,9 +24,6 @@ public:
 	virtual void mouseMoveEvent(QMouseEvent *event);
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void wheelEvent(QWheelEvent *event);
-
-	bool set_format(uint32_t width, uint32_t height);
-	bool send_data(uint32_t size, const uint8_t *data_ptr);
 
 protected:
 	void _init_vertexs();
@@ -49,22 +37,16 @@ protected:
 protected:
 	uint32_t _window_width;
 	uint32_t _window_height;
-	uint32_t _width;
-	uint32_t _height;
 
 	QOpenGLShaderProgram *_program_ptr;
 	QOpenGLTexture *_texture_ptr;
 	QOpenGLVertexArrayObject _VAO;
 	QOpenGLBuffer _VBO;
-	QOpenGLBuffer _EBO;
 	int _matrix_location;
-	uint32_t _vertice_count;
 
 	mouse_param_t _mouse_param;
 	camera_param_t _camera_param;
 
-	QReadWriteLock _locker;
-	uint32_t _buf_size;
-	uint8_t *_buf_ptr;
+	QVector<QImage> _imgs; // {left, right, up, down, front, back}
 };
 

@@ -80,7 +80,7 @@ static const char *fragment_shader_source_YUV709 =
 
 ///////////////////////////////////////////////////
 // Vertex/Fragment - for pano
-const char *vertex_shader_source_pano =
+static const char *vertex_shader_source_pano =
 "attribute vec3 pos_coords;\n"
 "attribute vec2 tex_coords;\n"
 "varying vec2 v_texcoord;\n"
@@ -90,10 +90,29 @@ const char *vertex_shader_source_pano =
 "	v_texcoord = tex_coords;\n"
 "}\n";
 
-const char *fragment_shader_source_pano =
+static const char *fragment_shader_source_pano =
 "uniform sampler2D tex_sampler;\n"
 "varying vec2 v_texcoord;\n"
 "void main() {\n"
 "	gl_FragColor = texture(tex_sampler, v_texcoord);\n"
+"}\n";
+
+
+///////////////////////////////////////////////////
+// Vertex/Fragment - for skybox
+static const char *vertex_shader_source_skybox =
+"attribute vec3 pos_coords;\n"
+"varying vec3 v_texcoord;\n"
+"uniform mat4 matrix;"
+"void main() {\n"
+"	v_texcoord = pos_coords;\n"
+"	gl_Position = matrix * vec4(pos_coords, 1.0);\n"
+"}\n";
+
+static const char *fragment_shader_source_skybox =
+"uniform samplerCube cube_sampler;\n"
+"varying vec3 v_texcoord;\n"
+"void main() {\n"
+"	gl_FragColor = texture(cube_sampler, v_texcoord);\n"
 "}\n";
 

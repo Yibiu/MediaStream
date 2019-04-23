@@ -17,6 +17,9 @@ COpenGLPano::COpenGLPano(QWidget *parent)
 
 	memset(&_mouse_param, 0x00, sizeof(_mouse_param));
 	memset(&_camera_param, 0x00, sizeof(_camera_param));
+
+	_buf_size = 0;
+	_buf_ptr = NULL;
 }
 
 COpenGLPano::~COpenGLPano()
@@ -34,6 +37,12 @@ COpenGLPano::~COpenGLPano()
 	_VBO.destroy();
 	_EBO.destroy();
 	doneCurrent();
+
+	if (NULL != _buf_ptr) {
+		delete[] _buf_ptr;
+		_buf_ptr = NULL;
+	}
+	_buf_size = 0;
 }
 
 void COpenGLPano::initializeGL()
@@ -48,7 +57,7 @@ void COpenGLPano::initializeGL()
 	_reset_camera();
 
 	// :/VLCPlayer/Resources/images/wall.jpg
-	_img.load(":/VLCPlayer/Resources/images/nibiru.png");
+	//_img.load(":/VLCPlayer/Resources/images/nibiru.png");
 }
 
 void COpenGLPano::resizeGL(int w, int h)
@@ -64,13 +73,19 @@ void COpenGLPano::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
+	if (0 == _width || 0 == _height || NULL == _buf_ptr)
+		return;
+
 	_texture_ptr->bind();
 	_program_ptr->bind();
 	QMatrix4x4 matrix;
 	matrix = _get_projection_matrix() * _get_view_matrix() * _get_model_matrix();
 	_program_ptr->setUniformValue("matrix", matrix);
 	glUniform1i(_program_ptr->uniformLocation("tex_sampler"), 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _img.width(), _img.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, _img.bits());
+	_locker.lockForRead();
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _img.width(), _img.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, _img.bits());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_BGR, GL_UNSIGNED_BYTE, _buf_ptr);
+	_locker.unlock();
 	QOpenGLVertexArrayObject::Binder vao_binder(&_VAO);
 #ifdef ENABLE_VR360
 	glDrawArrays(GL_TRIANGLES, 0, _vertice_count);
@@ -155,14 +170,36 @@ void COpenGLPano::wheelEvent(QWheelEvent *event)
 	QWidget::wheelEvent(event);
 }
 
-void COpenGLPano::set_format(uint32_t width, uint32_t height)
+bool COpenGLPano::set_format(uint32_t width, uint32_t height)
 {
 	_width = width;
 	_height = height;
+
+	uint32_t new_size = width * height * 4;
+	if (_buf_size < new_size) {
+		if (NULL != _buf_ptr) {
+			delete[] _buf_ptr;
+		}
+		_buf_ptr = new uint8_t[new_size];
+		if (NULL == _buf_ptr) {
+			_buf_size = 0;
+			return false;
+		}
+		_buf_size = new_size;
+	}
+
+	return true;
 }
 
-void COpenGLPano::set_data(const uint8_t *data_ptr)
+bool COpenGLPano::send_data(uint32_t size, const uint8_t *data_ptr)
 {
+	if (NULL != data_ptr && size <= _buf_size) {
+		_locker.lockForWrite();
+		memcpy(_buf_ptr, data_ptr, size);
+		_locker.unlock();
+	}
+	update();
+	return true;
 }
 
 
@@ -313,7 +350,7 @@ QMatrix4x4 COpenGLPano::_get_projection_matrix()
 #ifdef ENABLE_VR360
 	float ratio = (float)_window_height / (float)_window_width;
 	projection.frustum(-0.1f, 0.1f, -0.1f * ratio, 0.1f * ratio, _camera_param.fov, 300.0f); // Resize not change.
-																							 //projection.perspective(_camera_param.fov, (float)_window_height / (float)_window_width, 0.1f, 400.0f); // Resize changing.
+	//projection.perspective(_camera_param.fov, (float)_window_height / (float)_window_width, 0.1f, 400.0f); // Resize changing.
 #else
 #endif
 

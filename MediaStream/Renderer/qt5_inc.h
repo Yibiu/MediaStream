@@ -44,4 +44,23 @@ typedef struct _vertex_data
 	QVector2D tex_coord;
 } vertex_data_t;
 
+typedef struct _camera_param
+{
+	QVector3D position;
+	QVector3D direction;
+	QVector3D up;
+
+	float fov;
+	float rotate_H;
+	float rotate_V;
+} camera_param_t;
+
+typedef struct _mouse_param
+{
+	bool pressed;
+
+	QVector2D cur_pos;
+	QVector2D last_pos;
+} mouse_param_t;
+
 

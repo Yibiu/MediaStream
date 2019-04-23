@@ -163,6 +163,8 @@ bool COpenGLWidget::send_data(uint32_t size, const uint8_t *data_ptr)
 		memcpy(_buf_ptr, data_ptr, size);
 		_locker.unlock();
 	}
+	update();
+	return true;
 }
 
 
