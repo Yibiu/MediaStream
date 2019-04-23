@@ -17,7 +17,8 @@ Version0.1:2019.4.22
 
 ## 二：项目结构
 
-- MediaStream：无
+- **FfmpegMedia：** FFmpeg相关的封装、解封装、视频解码、音频解码；
+- **MediaStream：** 无
 
 
 
@@ -135,6 +136,12 @@ Version0.1:2019.4.22
 - FFmpeg出来的音频帧是不带ADTS的，因此需要在每帧前加ADTS头：
 
   ![ADTS](./ADTS.png)
+
+  ### 3.2 Mux
+
+  - 解码数据：解码数据与Demux存在对应关系，保存在extradata中；
+
+  - 时间戳：Mux时间戳需要自己打，注意FFmpeg的时间戳转换问题。
 
   
 
