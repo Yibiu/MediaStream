@@ -12,7 +12,7 @@ COpenGLWidget::COpenGLWidget(QWidget *parent)
 
 	_width = 0;
 	_height = 0;
-	_fourcc = VIDEO_DOURCC_UNKNOWN;
+	_fourcc = VIDEO_FOURCC_UNKNOWN;
 
 	_buf_size = 0;
 	_buf_ptr = NULL;

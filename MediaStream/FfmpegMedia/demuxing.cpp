@@ -294,7 +294,7 @@ void CDemuxing::run()
 
 video_fourcc_t CDemuxing::_get_video_fourcc(AVPixelFormat fmt)
 {
-	video_fourcc_t fourcc = VIDEO_DOURCC_UNKNOWN;
+	video_fourcc_t fourcc = VIDEO_FOURCC_UNKNOWN;
 	switch (fmt)
 	{
 	case AV_PIX_FMT_RGBA:
